@@ -1,0 +1,84 @@
+{% set period_map = {
+"1mo": "1个月",
+"3mo": "3个月",
+"6mo": "6个月",
+"1y": "1年",
+"2y": "2年"
+} %}
+
+{% set column_map = {
+"日期": "日期",
+"股票代码": "股票代码",
+"股票名称": "股票名称",
+"开盘价": "开盘价 (元)",
+"收盘价": "收盘价 (元)",
+"最高价": "最高价 (元)",
+"最低价": "最低价 (元)",
+"成交量": "成交量 (手)",
+"成交额": "成交额 (元)",
+"换手率": "换手率 (%)",
+"振幅": "振幅 (%)",
+"涨跌幅": "涨跌幅 (%)",
+"涨跌额": "涨跌额 (元)",
+"主力净流入(元)": "主力净流入 (元)",
+"小单净流入(元)": "小单净流入 (元)",
+"中单净流入(元)": "中单净流入 (元)",
+"大单净流入(元)": "大单净流入 (元)",
+"超大单净流入(元)": "超大单净流入 (元)",
+"主力净流入占比(%)": "主力净流入占比 (%)",
+"小单净流入占比(%)": "小单净流入占比 (%)",
+"中单净流入占比(%)": "中单净流入占比 (%)",
+"大单净流入占比(%)": "大单净流入占比 (%)"
+} %}
+
+{% extends "base.html" %}
+
+{% block title %}股票 {{ symbol }} 数据 - {{ period_map.get(period, period) }}{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: var(--spacing-lg);">
+    <div class="card" style="
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      padding: var(--spacing-lg);
+      min-width: 1200px;   /* 放宽卡片最小宽度 */
+    ">
+        <h2 style="color: var(--primary-color); margin-bottom: var(--spacing-md); white-space: nowrap;">
+            {{ stock_data[0]['股票名称'] or '未知股票' }} ({{ symbol }}) - {{ period_map.get(period, period) }}
+        </h2>
+
+        <div style="margin-bottom: var(--spacing-md);">
+            <a href="/download/{{ symbol }}/{{ period }}?format=csv" class="btn btn-primary"
+                style="margin-right: var(--spacing-sm);">
+                <i class="fas fa-file-csv"></i> 下载 CSV
+            </a>
+            <a href="/download/{{ symbol }}/{{ period }}?format=xlsx" class="btn btn-primary">
+                <i class="fas fa-file-excel"></i> 下载 Excel
+            </a>
+        </div> </a>
+
+        <div style="overflow-x: auto;">
+            <table style="min-width: 1400px;"> <!-- 让表格不要过窄 -->
+                <thead>
+                    <tr>
+                        {% for col in stock_data[0].keys() %}
+                        <th style="white-space: nowrap;">{{ column_map.get(col, col) }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in stock_data %}
+                    <tr>
+                        {% for val in row.values() %}
+                        <td style="white-space: nowrap;">{{ val if val is not none else '--' }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

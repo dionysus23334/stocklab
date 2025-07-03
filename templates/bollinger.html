@@ -1,0 +1,86 @@
+{% set period_map = {
+"1mo": "1个月",
+"3mo": "3个月",
+"6mo": "6个月",
+"1y": "1年",
+"2y": "2年"
+} %}
+
+{% extends "base.html" %}
+{% block title %}布林通道 - {{ symbol }}{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: var(--spacing-lg);">
+  <div class="card" style="
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      padding: var(--spacing-lg);
+    ">
+    <h2 style="
+        color: var(--primary-color);
+        margin-bottom: var(--spacing-md);
+        font-size: 1.5rem;
+    ">
+      {{ stock_name }} ({{ symbol }}) - 布林通道 K线图 ({{ period_map.get(period, period) }})
+    </h2>
+    <div id="bollinger-chart" style="height:600px;"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+const chartData = {{ chart_data_json|safe }};
+
+if (chartData.length > 0) {
+    const dates = chartData.map(d => d.日期);
+    const open = chartData.map(d => d.开盘价);
+    const high = chartData.map(d => d.最高价);
+    const low = chartData.map(d => d.最低价);
+    const close = chartData.map(d => d.收盘价);
+    const upper = chartData.map(d => d.upper);
+    const lower = chartData.map(d => d.lower);
+
+    const trace_candle = {
+        x: dates,
+        open: open,
+        high: high,
+        low: low,
+        close: close,
+        type: 'candlestick',
+        name: 'K线'
+    };
+
+    const trace_upper = {
+        x: dates,
+        y: upper,
+        type: 'scatter',
+        mode: 'lines',
+        name: 'BOLL上轨',
+        line: { color: '#ef4444' }
+    };
+
+    const trace_lower = {
+        x: dates,
+        y: lower,
+        type: 'scatter',
+        mode: 'lines',
+        name: 'BOLL下轨',
+        line: { color: '#10b981' }
+    };
+
+    Plotly.newPlot('bollinger-chart', [trace_candle, trace_upper, trace_lower], {
+        xaxis: { rangeslider: { visible: false } },
+        yaxis: { autorange: true },
+        plot_bgcolor: '#f8fafc',
+        paper_bgcolor: '#ffffff',
+        margin: { t: 40, l: 40, r: 40, b: 40 }
+    });
+} else {
+    document.getElementById('bollinger-chart').innerText = "暂无数据";
+}
+</script>
+{% endblock %}

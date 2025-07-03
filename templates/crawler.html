@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}数据爬虫 - 股票技术分析平台{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1 class="page-title">股票数据爬虫</h1>
+        <p class="page-subtitle">获取实时股票数据和技术指标分析</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="crawler-container">
+        <div class="search-section">
+            <div class="search-card">
+                <h3>股票查询</h3>
+                <form id="stockForm" class="stock-form" action="" method="get" onsubmit="return redirectToStock(event)">
+                    <div class="form-group">
+                        <label for="stockSymbol">股票代码</label>
+                        <input type="text" name="StockCode" placeholder="例如: 000001, 600000" required>
+                        <small class="form-hint">支持A股代码格式，如：000001（深交所）、600000（上交所）</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="timePeriod">时间周期</label>
+                        <select name="Period">
+                            <option value="1mo">1个月</option>
+                            <option value="3mo">3个月</option>
+                            <option value="6mo">6个月</option>
+                            <option value="1y" selected>1年</option>
+                            <option value="2y">2年</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        获取数据
+                    </button>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+function redirectToStock(event) {
+    event.preventDefault();
+    const form = event.target;
+    const code = form.StockCode.value.trim();
+    const period = form.Period.value;
+    if(code) {
+        // 跳转到动态路由
+        window.location.href = `/stock/${code}/${period}`;
+    }
+    return false;
+}
+</script>
+{% endblock %}
+
